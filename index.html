@@ -201,7 +201,7 @@
 
             // Toggle full screen
             fsInput.onclick = function() {
-                fsInput.value = (fsInput.value = "0" ? "1" : "0");
+                fsInput.value = (fsInput.value == "0" ? "1" : "0");
                 refreshFullscreen();
                 refreshQuery();
             }
