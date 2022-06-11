@@ -69,7 +69,7 @@
         <br>
         <div class="settings">
             <span id="info">Recording (0%)</span>
-            <button id="fsInput" data-min="0" data-max="1" >Fullscreen</button>
+            <button id="fsInput" data-min="0" data-max="1">Fullscreen</button>
             <button id="recordGif">Record GIF</button>
             <div id="paused">Rendering paused to improve performance</div>
         </div>
@@ -81,6 +81,10 @@
             var recordGifButton = document.getElementById("recordGif");
             var infoSpan = document.getElementById("info");
             var pausedDiv = document.getElementById("paused");
+            function inputValid(i) {
+                return i && parseInt(i.value) >= parseInt(i.getAttribute("data-min")) &&
+                            parseInt(i.value) <= parseInt(i.getAttribute("data-max"));
+            }
 
             // Snowcrash ETH contract
             var web3 = new Web3(new Web3.providers.HttpProvider("https://rpc.flashbots.net"));
@@ -108,11 +112,7 @@
 
                         // Update inputs with valid query values
                         var input = document.getElementById(setting[0] + "Input");
-                        if (input && setting[1] >= parseInt(input.getAttribute("data-min"))
-                                  && setting[1] <= parseInt(input.getAttribute("data-max")))
-                        {
-                            input.value = setting[1];
-                        }
+                        if (inputValid(input)) input.value = setting[1];
                     }
                 }
             }
@@ -121,9 +121,9 @@
             function refreshQuery(replace) {
                 var query = [idInput, fsInput].reduce(function(p,c) {
                     var show = // valid non-default values
-                        c.value > parseInt(c.getAttribute("data-min")) &&
-                        c.value <= parseInt(c.getAttribute("data-max"));
-                    return p + (show ? ((p?"&":"?") + c.id.slice(0,-5) + "=" + c.value):"");
+                        parseInt(c.value) > parseInt(c.getAttribute("data-min")) &&
+                        parseInt(c.value) <= parseInt(c.getAttribute("data-max"));
+                    return p + (show ? ((p?"&":"?") + c.id.slice(0,-5) + "=" + parseInt(c.value)):"");
                 }, "");
                 var url = location.pathname + query;
                 if (replace) history.replaceState(url, null, url);
@@ -133,13 +133,13 @@
             // Re-render when id changes
             var p5js = null;
             idInput.onchange = idInput.onmouseleave = function() {
-                if (idInput.validity.valid && tokenId != idInput.value) {
+                if (inputValid(idInput) && tokenId != parseInt(idInput.value)) {
                     refreshQuery();
                     resketch();
                 }
             }
             function resketch() {
-                tokenId = parseInt(idInput.value);
+                if (inputValid(idInput)) tokenId = parseInt(idInput.value);
                 snowcrash.methods._tokenIdToHash(tokenId).call().then(h => {
                     hash = h;
                     if (p5js) p5js.remove();
