@@ -1,1 +1,1 @@
-https://octal-crypto.github.io/snowcrash-to-gif
+https://octal.art/snowcrash-to-gif
